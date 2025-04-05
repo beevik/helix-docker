@@ -2,16 +2,16 @@
 # Docker configuration for P4D
 # --------------------------------------------------------------------------------
 
-FROM ubuntu:focal
+FROM ubuntu:noble
 
 LABEL vendor="Sourcegraph"
 LABEL maintainer="Joe Chen (joe@sourcegraph.com)"
 
 # Update Ubuntu and add Perforce Package Source
 RUN apt-get update && \
-  apt-get install -y wget gnupg2 && \
-  wget -qO - https://package.perforce.com/perforce.pubkey | apt-key add - && \
-  echo "deb http://package.perforce.com/apt/ubuntu focal release" > /etc/apt/sources.list.d/perforce.list && \
+  apt-get install -y curl gnupg2 && \
+  curl -sS https://package.perforce.com/perforce.pubkey | gpg --dearmor | tee /etc/apt/trusted.gpg.d/perforce.gpg > /dev/null && \
+  echo "deb http://package.perforce.com/apt/ubuntu noble release" > /etc/apt/sources.list.d/perforce.list && \
   apt-get update
 
 # --------------------------------------------------------------------------------
@@ -21,7 +21,8 @@ RUN apt-get update && \
 # Create perforce user and install Perforce Server
 # Do in-page search over https://package.perforce.com/apt/ubuntu/dists/focal/release/binary-amd64/Packages
 # for both "Package: helix-p4d" and "Package: helix-swarm-triggers".
-RUN apt-get update && apt-get install -y helix-p4d=2024.1-2625008~focal helix-swarm-triggers=2024.3-2628402~focal
+RUN apt-get install -y helix-p4d=2024.2-2726408~noble helix-swarm-triggers=2024.6-2710109~noble
+
 # Add external files
 COPY files/restore.sh /usr/local/bin/restore.sh
 COPY files/setup.sh /usr/local/bin/setup.sh
@@ -39,11 +40,11 @@ RUN \
 # --------------------------------------------------------------------------------
 
 # Default Environment
-ARG NAME=perforce-server
-ARG P4NAME=master
+ARG NAME=helix
+ARG P4NAME=main
 ARG P4TCP=1666
 ARG P4USER=admin
-ARG P4PASSWD=pass12349ers
+ARG P4PASSWD=temporary99
 ARG P4CASE=-C0
 ARG P4CHARSET=utf8
 

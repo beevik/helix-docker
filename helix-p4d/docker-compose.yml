@@ -1,0 +1,26 @@
+services:
+  perforce:
+    image: brett/helix-p4d:2024.2
+    container_name: p4d
+    ports:
+      - "1666:1666"
+    environment:
+      - P4ROOT=/opt/perforce/data
+      - P4PORT=1666
+      - P4USER=admin
+      - P4PASSWD=temporary99
+      - P4NAME=helix
+      - P4CASE=0
+    volumes:
+      - data:/opt/perforce/data
+    restart: unless-stopped
+    networks:
+      - network
+
+volumes:
+  data:
+    driver: local
+
+networks:
+  network:
+    driver: bridge
